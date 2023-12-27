@@ -1,5 +1,6 @@
 p5.disableFriendlyErrors = true; //small performance boost
 let img, copy, layer, layers, subd;
+let scene, camera, renderer;
 let color1Picker, color2Picker, color3Picker;
 let totalLayersSlider;
 let recomputeButton;
@@ -7,15 +8,109 @@ let transition1Slider, transition1SliderValue;
 let transition2Slider, transition2SliderValue;
 let transition3Slider, transition3SliderValue;
 let colorToggle;
+let currentMesh = null; // Add this line at the top of your script
+let baseSizeCm = 5;
 
 function preload() {
-  let name = "fd.png";
+  let name = "logoTest_mini.png";
   img = loadImage(name);
   copy = loadImage(name);
 }
 
+function setup3d() {
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87cefa);
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.5,
+    2000
+  );
+
+  var lithofunVertexShader = `
+  varying vec2 vUv;
+  void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+  var lithofunFragmentShader = `
+  uniform sampler2D theMap;
+  varying vec2 vUv;
+
+  void main() {
+    float gray = texture2D(theMap, vUv).g;
+    vec3 finalColor = vec3(1.0, 1.0, 1.0);
+    gl_FragColor = vec4((1.0 - gray * 0.7) * finalColor, gray * 0.2 + 0.8);
+  }
+`;
+
+  materialTranslucent = new THREE.ShaderMaterial({
+    transparent: true,
+    vertexShader: lithofunVertexShader,
+    fragmentShader: lithofunFragmentShader,
+    uniforms: {
+      theMap: { value: null },
+    },
+  });
+
+  camera.position.set(0, 120, 180);
+  camera.position.z = 100; // Move the camera back
+  renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setClearColor(0x000000); // Set background color to black
+  renderer.setSize(800, 600);
+  // let geometry = new THREE.BoxGeometry(5, 5, 5);
+  // let material = new THREE.MeshNormalMaterial();
+  // cube = new THREE.Mesh(geometry, material);
+
+  // Adding lighting
+  var sun = new THREE.DirectionalLight(0xffffff, 1.0);
+  sun.position.set(30, 12, 63);
+  scene.add(sun);
+
+  var sun2 = new THREE.DirectionalLight(0xffffff, 1.0);
+  sun2.position.set(-20, 25, -13);
+  scene.add(sun2);
+
+  var baseGeometry = new THREE.BoxGeometry(
+    baseSizeCm * 10,
+    10,
+    baseSizeCm * 10
+  );
+  var texLoader = new THREE.TextureLoader();
+  var baseTexture = texLoader.load("./grid.png");
+  baseTexture.wrapS = THREE.RepeatWrapping;
+  baseTexture.wrapT = THREE.RepeatWrapping;
+  baseTexture.repeat.x = baseSizeCm;
+  baseTexture.repeat.y = baseSizeCm;
+  var baseMaterial = new THREE.MeshLambertMaterial({ map: baseTexture });
+  var base = new THREE.Mesh(baseGeometry, baseMaterial);
+  base.position.y = -5;
+  scene.add(base);
+
+  // let pointLight = new THREE.PointLight(0xffffff, 1); // Increase brightness to 2
+  // pointLight.position.set(0, 0, 10); // Set light position to be in front of the cube
+  // pointLight.target = cube; // Set the light's direction towards the cube
+  // scene.add(pointLight);
+
+  // scene.add(cube);
+
+  camera.position.z = 10; // Adjust this value if needed
+
+  let container = document.getElementById("threejs-container");
+  renderer.setSize(container.clientWidth, container.clientHeight);
+  container.appendChild(renderer.domElement);
+
+  animate(); // Start the animation loop
+}
+
 function setup() {
-  createCanvas(400, 400);
+  setup3d();
+
+  let canvas = createCanvas(200, 200); // Create a p5.js canvas
+  canvas.parent("p5js-images"); // Append the canvas to the 'p5js-images' div
+
   input = createFileInput(handleFile);
   input.position(200, 5);
 
@@ -140,9 +235,51 @@ function handleFile(file) {
     copy = null;
   }
 }
+
 function recomputeImage() {
   // Reset the layer variable to 1
   layer = 1;
+
+  //After recomputing the image, create a 3d model
+  copy.loadPixels(); // Ensure that the pixel data is loaded
+  create3DModel();
+}
+
+function create3DModel() {
+  // Convert the image into a heightmap
+  copy.loadPixels();
+  let heightmap = [];
+  for (let i = 0; i < copy.pixels.length; i += 4) {
+    let brightness =
+      (copy.pixels[i] + copy.pixels[i + 1] + copy.pixels[i + 2]) / 3;
+    heightmap.push(brightness);
+  }
+  console.log("heightmap", heightmap);
+  // Create a 3D mesh from the heightmap
+  let geometry = new THREE.PlaneGeometry(1, 1, copy.width - 1, copy.height - 1);
+  let vertices = geometry.attributes.position.array;
+
+  console.log("geometry", geometry);
+  for (let i = 0, j = 0; i < vertices.length; i += 3, j++) {
+    vertices[i + 2] = (heightmap[j] / 255) * 10; // Multiply by 10 to make the variations in height more noticeable
+  }
+  geometry.attributes.position.needsUpdate = true; // This line is important
+  material = new THREE.MeshPhongMaterial({
+    color: new THREE.Color(0xd5d5d5),
+  });
+  let mesh = new THREE.Mesh(geometry, material);
+
+  // Remove the old mesh from the scene and add the new one
+  if (currentMesh !== null) {
+    scene.remove(currentMesh);
+  }
+  scene.add(mesh);
+
+  // Update the currentMesh variable to refer to the new mesh
+  currentMesh = mesh;
+
+  // Point the camera at the new mesh
+  camera.lookAt(mesh.position);
 }
 
 function draw() {
@@ -156,11 +293,9 @@ function draw() {
     image(img, img.width + 20, 0);
     image(copy, 0, 0);
   }
-
   let color1 = color1Picker.value();
   let color2 = color2Picker.value();
   let color3 = color3Picker.value(); // New color
-
   let layers = totalLayersSlider.value();
   // Get the values of the sliders
   let transition1 = transition1Slider.value();
@@ -169,9 +304,9 @@ function draw() {
 
   if (layer <= layers) {
     let thresh = parseInt(subd * (layer - 1)); // threshold to change pixels
+
     for (i = 0; i < copy.pixels.length; i += 4) {
       if (img.pixels[i + 3] == 0) continue; // skip on transparent pixels for png files
-
       if (layer == 1) {
         // the origin color for the color mix. After the first layer, it is the current image's color
         orig_color = color(base_color);
@@ -182,7 +317,6 @@ function draw() {
           copy.pixels[i + 2]
         );
       }
-
       if (use_gray) {
         current_value =
           (img.pixels[i] + img.pixels[i + 1] + img.pixels[i + 2]) / 3;
@@ -190,51 +324,48 @@ function draw() {
         let c = color(img.pixels[i], img.pixels[i + 1], img.pixels[i + 2]);
         current_value = hue(c);
       }
-
       if (current_value >= thresh) {
         let mixFactor = 0.3; // Variable for mix factor
-
         // use this switch-case to setup your layer changes. Add or remove layers and set mix-factor as you wish
         if (colorToggle.checked()) {
           // Checkbox is checked, use three colors
           switch (true) {
             case layer <= 1:
-              current_color = [base_color, mixFactor];
+              current_color = [base_color, 0.2];
               break;
             case layer <= transition1:
-              current_color = [color1, mixFactor];
+              current_color = [color1, 0.4];
               break;
             case layer <= transition2:
-              current_color = [color2, mixFactor];
+              current_color = [color2, 0.3];
               break;
             case layer <= transition3:
-              current_color = [color3, mixFactor]; // New color
+              current_color = [color3, 0.05]; // New color
               break;
             case layer <= layers:
-              current_color = ["white", mixFactor];
+              current_color = ["white", 0.1];
               break;
           }
         } else {
           // Checkbox is unchecked, use two colors
           switch (true) {
             case layer <= 1:
-              current_color = [base_color, 0.5];
+              current_color = [base_color, 0.2];
               break;
             case layer <= transition1:
-              current_color = [color1, 0.5];
+              current_color = [color1, 0.4];
               break;
             case layer <= transition2:
-              current_color = [color2, 0.2];
+              current_color = [color2, 0.1];
               break;
             case layer <= layers:
-              current_color = ["white", 0.5];
+              current_color = ["white", 0.15];
               break;
           }
         }
         color_layer(current_color);
       }
     }
-
     console.log("Layer " + layer + ", with " + current_color);
     copy.updatePixels();
     image(copy, 0, 0);
@@ -255,3 +386,14 @@ function color_layer(c_color) {
   copy.pixels[i + 1] = result[1];
   copy.pixels[i + 2] = result[2];
 }
+function animate() {
+  requestAnimationFrame(animate);
+  renderer.render(scene, camera);
+}
+// function animate() {
+
+//   requestAnimationFrame(animate);
+
+//   renderer.render(scene, camera);
+//   console.log("animation");
+// }

@@ -2,9 +2,11 @@
   <head>
     <title>IllumiStack</title>
   </head>
-  <body style="background-color: black;">
+  <body style="background-color: grey;">
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
     <script src="https://scrtwpns.com/mixbox.js"></script>
+    <script src="https://threejs.org/build/three.js"></script>
+    <!-- <script src="https://threejs.org/examples/jsm/loaders/STLLoader.js"></script> -->
     <script src="main.js"></script>
     <br>
     <br>
@@ -12,8 +14,15 @@
     <br>
     <br>
     <br>
-    <input type="color" id="color1" name="color1" value="#6600ff">
+    <input type="color" id="color1" name="color1" value="#6660ff">
     <input type="color" id="color2" name="color2" value="#ddb878">
-    <input type="color" id="color3" name="color3" value="#d9d9d9">
+    <input type="color" id="color3" name="color3" value="#d9fdd9">
+    <div id="p5js-images"><br></div>
+    <!-- The Three.js animation will appear after the p5.js images -->
+    <div id="threejs-container" style="width: 400px; height: 600px;"><br></div>
+    <br>
+
+    <br>
+
   </body>
 </html>
