@@ -10,6 +10,7 @@ let transition3Slider, transition3SliderValue;
 let colorToggle;
 let currentMesh = null; // Add this line at the top of your script
 let baseSizeCm = 5;
+let controls;
 
 function preload() {
   let name = "logoTest_mini.png";
@@ -56,13 +57,34 @@ function setup3d() {
   });
 
   camera.position.set(0, 120, 180);
-  camera.position.z = 100; // Move the camera back
+
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setClearColor(0x000000); // Set background color to black
   renderer.setSize(800, 600);
-  // let geometry = new THREE.BoxGeometry(5, 5, 5);
-  // let material = new THREE.MeshNormalMaterial();
-  // cube = new THREE.Mesh(geometry, material);
+
+  // Add event listener for keyboard events
+  window.addEventListener("keydown", function (event) {
+    switch (event.key) {
+      case "w":
+        // Zoom in
+        camera.position.y -= 10;
+        break;
+      case "s":
+        // Zoom out
+        camera.position.y += 10;
+        break;
+      case "a":
+        // Zoom in
+        camera.position.z -= 10;
+        break;
+      case "d":
+        // Zoom out
+        camera.position.z += 10;
+        break;
+    }
+
+    controls.update();
+  });
 
   // Adding lighting
   var sun = new THREE.DirectionalLight(0xffffff, 1.0);
@@ -96,11 +118,13 @@ function setup3d() {
 
   // scene.add(cube);
 
-  camera.position.z = 10; // Adjust this value if needed
+  camera.position.z = 100; // Adjust this value if needed
 
   let container = document.getElementById("threejs-container");
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
+
+  // controls = new OrbitControls(camera, renderer.domElement);
 
   animate(); // Start the animation loop
 }
@@ -279,6 +303,7 @@ function create3DModel() {
   currentMesh = mesh;
 
   // Point the camera at the new mesh
+  camera.position.z = 1; // Move the camera closer
   camera.lookAt(mesh.position);
 }
 
@@ -377,6 +402,8 @@ function draw() {
     }
     layer++;
   }
+
+  camera.lookAt(mesh.position);
 }
 
 function color_layer(c_color) {
@@ -388,6 +415,8 @@ function color_layer(c_color) {
 }
 function animate() {
   requestAnimationFrame(animate);
+  // controls.update();
+
   renderer.render(scene, camera);
 }
 // function animate() {
