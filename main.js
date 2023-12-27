@@ -57,7 +57,6 @@ function setup3d() {
   });
 
   camera.position.set(0, 120, 180);
-
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setClearColor(0x000000); // Set background color to black
   renderer.setSize(800, 600);
@@ -297,6 +296,12 @@ function create3DModel() {
   if (currentMesh !== null) {
     scene.remove(currentMesh);
   }
+  mesh.rotation.x = Math.PI / 2; // Rotate 90 degrees around the x-axis
+  mesh.rotation.z = Math.PI; // Rotate 90 degrees around the x-axis
+
+  mesh.position.y = 20; // Move the mesh 10 units up
+  mesh.scale.set(100, 100, 1); // Scale the mesh by a factor of 10
+
   scene.add(mesh);
 
   // Update the currentMesh variable to refer to the new mesh
@@ -402,8 +407,6 @@ function draw() {
     }
     layer++;
   }
-
-  camera.lookAt(mesh.position);
 }
 
 function color_layer(c_color) {
