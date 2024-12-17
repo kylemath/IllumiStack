@@ -123,7 +123,8 @@ function setup3d() {
   renderer.setSize(container.clientWidth, container.clientHeight);
   container.appendChild(renderer.domElement);
 
-  // controls = new OrbitControls(camera, renderer.domElement);
+  // Uncomment this line to enable OrbitControls
+  controls = new THREE.OrbitControls(camera, renderer.domElement);
 
   animate(); // Start the animation loop
 }
@@ -173,7 +174,7 @@ function setup() {
   colorToggle = createCheckbox("Use three colors", false);
   colorToggle.position(370, 110);
   colorToggle.style("color", "#ffffff");
-
+  // When the checkbox is checked, show the fourth slider
   colorToggle.changed(toggleColors);
 
   //Transition Sliders
@@ -418,8 +419,7 @@ function color_layer(c_color) {
 }
 function animate() {
   requestAnimationFrame(animate);
-  // controls.update();
-
+  controls.update();
   renderer.render(scene, camera);
 }
 // function animate() {

@@ -1,22 +1,30 @@
 <html>
   <head>
     <title>IllumiStack</title>
+    <script src="https://unpkg.com/three@0.134.0/build/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.134.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        if (THREE.OrbitControls) {
+            window.OrbitControls = THREE.OrbitControls;
+        }
+    </script>
   </head>
   <body style="background-color: grey;">
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
     <script src="https://scrtwpns.com/mixbox.js"></script>
-    <script src="https://threejs.org/build/three.js"></script>
-    <!-- <script type="module" src="./OrbitControls.js"></script> -->
-        <script src="main.js"></script>
+    <script src="main.js"></script>
     <br>
     <br>
     <br>
     <br>
     <br>
     <br>
-    <input type="color" id="color1" name="color1" value="#6660ff">
-    <input type="color" id="color2" name="color2" value="#ddb878">
-    <input type="color" id="color3" name="color3" value="#d9fdd9">
+    <input type="color" id="color1" name="color1" value="#6660ff" style="width: 50%;">
+    <input type="color" id="color2" name="color2" value="#ddb878" style="width: 50%;">
+    <input type="color" id="color3" name="color3" value="#d9fdd9" style="width: 50%;">
+    <input type="color" id="color4" name="color4" value="#ff0000" style="width: 50%;">
+
+
     <div id="p5js-images"><br></div>
     <!-- The Three.js animation will appear after the p5.js images -->
     <div id="threejs-container" style="width: 400px; height: 600px;"><br></div>
