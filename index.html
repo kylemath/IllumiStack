@@ -1,19 +1,646 @@
 <html>
   <head>
     <title>IllumiStack</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        color: #e4e4e7;
+        overflow: hidden;
+        height: 100vh;
+      }
+
+      .app-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: 60px auto 1fr;
+        height: 100vh;
+        gap: 0;
+      }
+
+      /* Header */
+      .header {
+        background: rgba(20, 20, 30, 0.95);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 0 24px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+      }
+
+      .header h1 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+
+      .header-actions {
+        display: flex;
+        gap: 12px;
+      }
+
+      /* Controls Bar */
+      .controls-bar {
+        background: rgba(20, 20, 30, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 16px 24px;
+        display: flex;
+        gap: 16px;
+        flex-wrap: nowrap;
+        align-items: flex-start;
+      }
+
+      .controls-bar::-webkit-scrollbar {
+        height: 8px;
+      }
+
+      .controls-bar::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .controls-bar::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 4px;
+      }
+
+      .control-section {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        min-width: 200px;
+        flex-shrink: 0;
+      }
+
+      .control-section:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.2);
+      }
+
+      .section-title {
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin: 0 0 10px 0;
+        color: #a78bfa;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        white-space: nowrap;
+      }
+
+      .section-content {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      /* Form Controls */
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .control-label {
+        font-size: 11px;
+        font-weight: 500;
+        color: #d4d4d8;
+      }
+
+      .control-value {
+        font-size: 10px;
+        color: #a1a1aa;
+        font-weight: 600;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.1);
+        outline: none;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      }
+
+      input[type="range"]::-moz-range-thumb {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        cursor: pointer;
+        border: none;
+      }
+
+      input[type="color"] {
+        width: 100%;
+        height: 40px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        background: transparent;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      input[type="color"]:hover {
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: scale(1.02);
+      }
+
+      input[type="text"],
+      input[type="number"] {
+        width: 100%;
+        padding: 6px 10px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 6px;
+        color: #e4e4e7;
+        font-size: 12px;
+        transition: all 0.2s ease;
+      }
+
+      input[type="text"]:focus,
+      input[type="number"]:focus {
+        outline: none;
+        border-color: #667eea;
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .btn {
+        padding: 8px 14px;
+        border: none;
+        border-radius: 6px;
+        font-size: 11px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+      }
+
+      .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+      }
+
+      .btn-secondary {
+        background: rgba(255, 255, 255, 0.1);
+        color: #e4e4e7;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-secondary:hover {
+        background: rgba(255, 255, 255, 0.15);
+      }
+
+      .btn-success {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+      }
+
+      .btn-success:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+      }
+
+      .btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none !important;
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        user-select: none;
+      }
+
+      .checkbox-group input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        accent-color: #667eea;
+      }
+
+      .checkbox-group label {
+        font-size: 11px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+
+      .color-grid {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .color-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        min-width: 70px;
+      }
+      
+      .color-item input[type="color"] {
+        height: 35px;
+      }
+
+      /* Main Content Area - Three Columns */
+      .main-content {
+        position: relative;
+        background: rgba(0, 0, 0, 0.2);
+        padding: 16px;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 16px;
+        overflow: auto;
+      }
+
+      .view-box {
+        background: rgba(0, 0, 0, 0.4);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 0;
+        height: 100%;
+      }
+
+      .view-title {
+        font-size: 13px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #a78bfa;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding-bottom: 8px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        flex-shrink: 0;
+      }
+
+      .view-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        position: relative;
+        min-height: 0;
+      }
+
+      #original-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      #original-container canvas {
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain;
+      }
+
+      #modified-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      #modified-container canvas {
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        object-fit: contain;
+      }
+
+      #three-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+      }
+
+      #three-container canvas {
+        max-width: 100% !important;
+        max-height: 100% !important;
+        width: auto !important;
+        height: auto !important;
+        border-radius: 8px;
+        object-fit: contain;
+      }
+
+      /* File Input Styling */
+      #file-input-container {
+        width: 100%;
+      }
+
+      #file-input-container input[type="file"] {
+        width: 100%;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      #file-input-container input[type="file"]:hover {
+        background: rgba(255, 255, 255, 0.1) !important;
+        border-color: rgba(255, 255, 255, 0.4) !important;
+      }
+
+      /* Style the file input button text */
+      #file-input-container input[type="file"]::file-selector-button {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        margin-right: 12px;
+      }
+
+      #file-input-container input[type="file"]::file-selector-button:hover {
+        opacity: 0.9;
+      }
+
+      /* Responsive */
+      @media (max-width: 1200px) {
+        .main-content {
+          grid-template-columns: 1fr;
+          grid-template-rows: repeat(3, auto);
+        }
+        
+        .view-box {
+          min-height: 300px;
+        }
+      }
+      
+      @media (min-width: 1201px) and (max-width: 1600px) {
+        .main-content {
+          grid-template-columns: repeat(2, 1fr);
+          grid-template-rows: auto auto;
+        }
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .control-section {
+        animation: fadeIn 0.3s ease-out;
+      }
+    </style>
   </head>
-  <body style="background-color: black;">
+  <body>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.js"></script>
     <script src="https://scrtwpns.com/mixbox.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    
+    <div class="app-container">
+      <!-- Header -->
+      <div class="header">
+        <h1>⚡ ILLUMISTACK</h1>
+        <div class="header-actions" id="header-actions">
+          <!-- Dynamic buttons will be added here -->
+        </div>
+      </div>
+
+      <!-- Controls Bar -->
+      <div class="controls-bar" id="controls-bar">
+        <!-- File Upload Section -->
+        <div class="control-section">
+          <div class="section-title">📁 Image Input</div>
+          <div class="section-content">
+            <div id="file-input-container">
+              <!-- File input will be added here by p5 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Layer Settings -->
+        <div class="control-section">
+          <div class="section-title">📐 Layer Settings</div>
+          <div class="section-content">
+            <div class="control-group">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="control-label">Total Layers</span>
+                <span class="control-value" id="total-layers-value">15</span>
+              </div>
+              <div id="total-layers-slider"></div>
+            </div>
+            <button class="btn btn-secondary" id="recompute-btn-sidebar">🔄 Recompute Image</button>
+          </div>
+        </div>
+
+        <!-- Color Controls -->
+        <div class="control-section">
+          <div class="section-title">🎨 Color Palette</div>
+          <div class="section-content">
+            <div class="checkbox-group" id="color-toggle-container">
+              <!-- Checkbox will be moved here -->
+            </div>
+            <div class="color-grid">
+              <div class="color-item">
+                <span class="control-label">Color 1</span>
+                <input type="color" id="color1" name="color1" value="#6600ff">
+              </div>
+              <div class="color-item">
+                <span class="control-label">Color 2</span>
+                <input type="color" id="color2" name="color2" value="#ddb878">
+              </div>
+              <div class="color-item">
+                <span class="control-label">Color 3</span>
+                <input type="color" id="color3" name="color3" value="#d9d9d9">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Transition Controls -->
+        <div class="control-section">
+          <div class="section-title">⚡ Transitions</div>
+          <div class="section-content">
+            <div class="control-group">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="control-label">Transition 1</span>
+                <span class="control-value" id="transition1-value">3</span>
+              </div>
+              <div id="transition1-slider"></div>
+            </div>
+            <div class="control-group">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="control-label">Transition 2</span>
+                <span class="control-value" id="transition2-value">6</span>
+              </div>
+              <div id="transition2-slider"></div>
+            </div>
+            <div class="control-group">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span class="control-label">Transition 3</span>
+                <span class="control-value" id="transition3-value">9</span>
+              </div>
+              <div id="transition3-slider"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Display Settings -->
+        <div class="control-section">
+          <div class="section-title">📏 Display Size</div>
+          <div class="section-content">
+            <div class="control-group">
+              <span class="control-label">Output Width (cm)</span>
+              <input type="number" id="output-width" value="100" min="1" step="1">
+            </div>
+            <div class="control-group">
+              <span class="control-label">Output Height (cm)</span>
+              <input type="number" id="output-height" value="100" min="1" step="1">
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="lock-aspect" checked>
+              <label for="lock-aspect">Lock Aspect Ratio</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3D Export Settings -->
+        <div class="control-section">
+          <div class="section-title">🎯 3D Export</div>
+          <div class="section-content">
+            <div class="control-group">
+              <span class="control-label">Model Width (mm)</span>
+              <input type="number" id="model-width" value="100" min="1" step="1">
+            </div>
+            <div class="control-group">
+              <span class="control-label">Layer Height (mm)</span>
+              <input type="number" id="layer-height" value="0.2" min="0.01" step="0.01">
+            </div>
+            <div class="control-group">
+              <span class="control-label">Base Layers</span>
+              <input type="number" id="base-layers" value="3" min="1" step="1">
+            </div>
+            <div class="checkbox-group">
+              <input type="checkbox" id="compensate-first-layer" checked>
+              <label for="compensate-first-layer" title="Adds extra height to compensate for thicker first layer in slicer">Compensate First Layer</label>
+            </div>
+            <button class="btn btn-primary" id="generate-mesh-btn">🔮 Generate 3D Mesh</button>
+            <button class="btn btn-success" id="download-stl-btn" disabled>💾 Download STL</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Original Image View -->
+        <div class="view-box">
+          <h3 class="view-title">🖼️ Original Image</h3>
+          <div class="view-content">
+            <div id="original-container"></div>
+          </div>
+        </div>
+
+        <!-- Modified Image View -->
+        <div class="view-box">
+          <h3 class="view-title">🎨 Modified Image (Processing)</h3>
+          <div class="view-content">
+            <div id="modified-container"></div>
+          </div>
+        </div>
+
+        <!-- 3D View -->
+        <div class="view-box">
+          <h3 class="view-title">🔮 3D Model Preview</h3>
+          <div class="view-content">
+            <div id="three-container">
+              <p style="color: #a1a1aa; font-size: 13px; text-align: center;">Generate 3D mesh to preview</p>
+            </div>
+          </div>
+          <div id="layer-info" style="display: none; margin-top: 12px; padding: 12px; background: rgba(0, 0, 0, 0.3); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+            <div style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #a78bfa; margin-bottom: 8px;">
+              🎨 Recommended Print Layers
+            </div>
+            <div id="layer-info-content" style="font-size: 11px; line-height: 1.6; color: #d4d4d8;">
+              <!-- Layer information will be inserted here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <script src="main.js"></script>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <input type="color" id="color1" name="color1" value="#6600ff">
-    <input type="color" id="color2" name="color2" value="#ddb878">
-    <input type="color" id="color3" name="color3" value="#d9d9d9">
   </body>
+</html>
 </html>
