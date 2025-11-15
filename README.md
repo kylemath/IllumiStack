@@ -1,6 +1,7 @@
 # IllumiStack
 
 3d Printing with Stacked colour layers web app
+🚀 **[Live Demo](https://kylemath.github.io/IllumiStack)** 🚀
 
 ![IllumiStack Screenshot](screenshot.png)
 
