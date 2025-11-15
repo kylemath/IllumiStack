@@ -2,7 +2,7 @@
   "id": "IllumiStack",
   "title": "IllumiStack",
   "oneLiner": "Multicolour 3D printed layer based colour mixing and shading in the browser, open source and free",
-  "demoUrl": "https://kylemath/github.io/IllumiStack",
+  "demoUrl": "https://kylemath.github.io/IllumiStack",
   "screenshot": "https://raw.githubusercontent.com/kylemath/IllumiStack/main/screenshot.png",
   "kind": "project",
   "categories": ["3dPrinting", "webpage", "sign"],
